@@ -34,6 +34,8 @@ def search(maze, searchMethod):
 def bfs(maze):
     # TODO: Write your code here
     # return path, num_states_explored
+    start = maze.getStart()
+    neighbors = maze.getNeighbors()
     return [], 0
 
 
