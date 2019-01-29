@@ -40,21 +40,24 @@ def bfs(maze):
     visited = [start]
     path = [start]
     list(map(to_visit.put, maze.getNeighbors(start[0], start[1])))
-    states_explored = 0
+    states_explored = 1
 
     while not to_visit.empty():
         curr_state = to_visit.get()
-        path.append(curr_state)
-        visited.append(curr_state)
-        states_explored += 1
 
-        if maze.isObjective(curr_state[0], curr_state[1]):
-            break
+        if curr_state not in visited:
 
-        neighbors = maze.getNeighbors(curr_state[0], curr_state[1])
-        for neighbor in neighbors:
-            if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
-                to_visit.put(neighbor)
+            path.append(curr_state)
+            visited.append(curr_state)
+            states_explored += 1
+
+            if maze.isObjective(curr_state[0], curr_state[1]):
+                break
+
+            neighbors = maze.getNeighbors(curr_state[0], curr_state[1])
+            for neighbor in neighbors:
+                if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
+                    to_visit.put(neighbor)
 
     return path, states_explored
 
