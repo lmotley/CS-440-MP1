@@ -21,6 +21,7 @@ files and classes when code is run, so be careful to not modify anything else.
 # Number of states explored should be a number.
 # maze is a Maze object based on the maze from the file specified by input filename
 # searchMethod is the search method specified by --method flag (bfs,dfs,greedy,astar)
+import queue
 
 def search(maze, searchMethod):
     return {
@@ -35,8 +36,27 @@ def bfs(maze):
     # TODO: Write your code here
     # return path, num_states_explored
     start = maze.getStart()
-    neighbors = maze.getNeighbors()
-    return [], 0
+    to_visit = queue.Queue()
+    visited = [start]
+    path = [start]
+    list(map(to_visit.put, maze.getNeighbors(start[0], start[1])))
+    states_explored = 0
+
+    while not to_visit.empty():
+        curr_state = to_visit.get()
+        path.append(curr_state)
+        visited.append(curr_state)
+        states_explored += 1
+
+        if maze.isObjective(curr_state[0], curr_state[1]):
+            break
+
+        neighbors = maze.getNeighbors(curr_state[0], curr_state[1])
+        for neighbor in neighbors:
+            if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
+                to_visit.put(neighbor)
+
+    return path, states_explored
 
 
 def dfs(maze):
