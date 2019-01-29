@@ -95,4 +95,28 @@ def greedy(maze):
 def astar(maze):
     # TODO: Write your code here
     # return path, num_states_explored
+    start = maze.getStart()
+    path = [start]
+    visited = [(1, start)]
+    to_visit = queue.PriorityQueue()
+
+    while to_visit:
+        curr_state = to_visit.get()
+        visited.append(curr_state)
+
+        neighbors = maze.getNeighbors(curr_state[0], curr_state[1])
+        for neighbor in neighbors:
+            if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
+                to_visit.put((manhattan_dist(neighbor, maze), neighbor))
+
     return [], 0
+
+def manhattan_dist(pos, maze):
+    objectives = maze.getObjectives()
+    min_heuristic = sys.maxsize
+    for objective in objectives:
+        heuristic = math.abs(pos[0] - objective[0]) + math.abs(pos[1] - objective[1])
+        if heuristic < min_heuristic:
+            min_heuristic = heuristic
+
+    return min_heuristic
