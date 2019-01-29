@@ -21,7 +21,7 @@ files and classes when code is run, so be careful to not modify anything else.
 # Number of states explored should be a number.
 # maze is a Maze object based on the maze from the file specified by input filename
 # searchMethod is the search method specified by --method flag (bfs,dfs,greedy,astar)
-import queue
+import queue, math, sys
 
 def search(maze, searchMethod):
     return {
@@ -37,19 +37,19 @@ def bfs(maze):
     # return path, num_states_explored
     start = maze.getStart()
     to_visit = queue.Queue()
-    visited = [start]
-    path = [start]
-    list(map(to_visit.put, maze.getNeighbors(start[0], start[1])))
-    states_explored = 1
+    to_visit.put(start)
+    visited = []
+    path = []
+    num_states_explored = 0
 
-    while not to_visit.empty():
+    while to_visit:
         curr_state = to_visit.get()
 
         if curr_state not in visited:
 
             path.append(curr_state)
             visited.append(curr_state)
-            states_explored += 1
+            num_states_explored += 1
 
             if maze.isObjective(curr_state[0], curr_state[1]):
                 break
@@ -59,7 +59,7 @@ def bfs(maze):
                 if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
                     to_visit.put(neighbor)
 
-    return path, states_explored
+    return path, num_states_explored
 
 
 def dfs(maze):
@@ -96,26 +96,36 @@ def astar(maze):
     # TODO: Write your code here
     # return path, num_states_explored
     start = maze.getStart()
-    path = [start]
-    visited = [(1, start)]
     to_visit = queue.PriorityQueue()
+    to_visit.put((1, start))
+    visited = []
+    path = []
+    num_states_explored = 0
 
     while to_visit:
         curr_state = to_visit.get()
-        visited.append(curr_state)
 
-        neighbors = maze.getNeighbors(curr_state[0], curr_state[1])
-        for neighbor in neighbors:
-            if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
-                to_visit.put((manhattan_dist(neighbor, maze), neighbor))
+        if curr_state[1] not in visited:
 
-    return [], 0
+            path.append(curr_state[1])
+            visited.append(curr_state[1])
+            num_states_explored += 1
+
+            neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
+            for neighbor in neighbors:
+                if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
+                    to_visit.put((manhattan_dist(neighbor, maze), neighbor))
+
+        #if(states_explored % 100 == 0):
+            #print(states_explored)
+
+    return path, num_states_explored
 
 def manhattan_dist(pos, maze):
     objectives = maze.getObjectives()
     min_heuristic = sys.maxsize
     for objective in objectives:
-        heuristic = math.abs(pos[0] - objective[0]) + math.abs(pos[1] - objective[1])
+        heuristic = abs(pos[0] - objective[0]) + abs(pos[1] - objective[1])
         if heuristic < min_heuristic:
             min_heuristic = heuristic
 
