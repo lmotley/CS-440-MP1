@@ -92,6 +92,7 @@ def dfs(maze):
 def greedy(maze):
     # TODO: Write your code here
     # return path, num_states_explored
+    print(manhattan_distance((0,1), (1,0)))
     return [], 0
 
 
