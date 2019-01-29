@@ -102,7 +102,7 @@ def astar(maze):
     path = []
     num_states_explored = 0
 
-    while to_visit:
+    while not to_visit.empty():
         curr_state = to_visit.get()
 
         if curr_state[1] not in visited:
@@ -111,13 +111,13 @@ def astar(maze):
             visited.append(curr_state[1])
             num_states_explored += 1
 
+            if maze.isObjective(curr_state[1][0], curr_state[1][1]):
+                break
+
             neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
             for neighbor in neighbors:
                 if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
                     to_visit.put((manhattan_dist(neighbor, maze), neighbor))
-
-        #if(states_explored % 100 == 0):
-            #print(states_explored)
 
     return path, num_states_explored
 
