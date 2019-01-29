@@ -46,6 +46,7 @@ def dfs(maze):
 def greedy(maze):
     # TODO: Write your code here
     # return path, num_states_explored
+    print(manhattan_distance((0,1), (1,0)))
     return [], 0
 
 
@@ -53,3 +54,6 @@ def astar(maze):
     # TODO: Write your code here
     # return path, num_states_explored
     return [], 0
+
+def manhattan_distance(start, end):
+    return abs(start[0] - end[0]) + abs(start[1] - end[1])
