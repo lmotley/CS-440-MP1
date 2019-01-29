@@ -51,8 +51,10 @@ def dfs(maze):
         if pos not in path:
             path.append(pos)
             num_states_explored += 1
-            if maze.isObjective(pos[0], pos[1]):
-                return path, num_states_explored
+            if pos in objectives:
+                objectives.remove(pos)
+                if len(objectives) == 0:
+                    return path, num_states_explored
             for neighbor in maze.getNeighbors(pos[0], pos[1]):
                 stack.append(neighbor)
 
