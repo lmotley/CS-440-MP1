@@ -40,7 +40,23 @@ def bfs(maze):
 def dfs(maze):
     # TODO: Write your code here
     # return path, num_states_explored
-    return [], 0
+    path = []
+    num_states_explored = 0
+    stack = []
+    startPos = maze.getStart()
+    stack.append(startPos)
+    objectives = maze.getObjectives()
+    while stack:
+        pos = stack.pop()
+        if pos not in path:
+            path.append(pos)
+            num_states_explored += 1
+            if maze.isObjective(pos[0], pos[1]):
+                return path, num_states_explored
+            for neighbor in maze.getNeighbors(pos[0], pos[1]):
+                stack.append(neighbor)
+
+    return path, num_states_explored
 
 
 def greedy(maze):
