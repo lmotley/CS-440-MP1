@@ -67,21 +67,24 @@ def dfs(maze):
     # return path, num_states_explored
     path = []
     num_states_explored = 0
-    stack = []
-    startPos = maze.getStart()
-    stack.append(startPos)
+    to_visit = []
+    start = maze.getStart()
+    to_visit.append(start)
     objectives = maze.getObjectives()
-    while stack:
-        pos = stack.pop()
-        if pos not in path:
-            path.append(pos)
+
+    while to_visit:
+        curr_state = to_visit.pop()
+
+        if curr_state not in path:
+            path.append(curr_state)
             num_states_explored += 1
-            if pos in objectives:
-                objectives.remove(pos)
+
+            if curr_state in objectives:
+                objectives.remove(curr_state)
                 if len(objectives) == 0:
                     return path, num_states_explored
-            for neighbor in maze.getNeighbors(pos[0], pos[1]):
-                stack.append(neighbor)
+            for neighbor in maze.getNeighbors(curr_state[0], curr_state[1]):
+                to_visit.append(neighbor)
 
     return path, num_states_explored
 
