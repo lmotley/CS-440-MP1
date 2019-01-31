@@ -92,8 +92,29 @@ def dfs(maze):
 def greedy(maze):
     # TODO: Write your code here
     # return path, num_states_explored
-    print(manhattan_distance((0,1), (1,0)))
-    return [], 0
+    path = []
+    num_states_explored = 0
+    visited = []
+    to_visit = queue.PriorityQueue()
+    start = maze.getStart()
+    to_visit.put(start)
+    objectives = maze.getObjectives()
+
+    while not to_visit.empty():
+        curr_state = to_visit.get()
+
+        if curr_state not in path:
+            path.append(curr_state)
+            num_states_explored += 1
+
+            if maze.isObjective(curr_state[0], curr_state[1]):
+                break
+
+            for neighbor in maze.getNeighbors(curr_state[0], curr_state[1]):
+                if neighbor not in path:
+                    to_visit.put(neighbor)
+
+    return path, num_states_explored
 
 
 def astar(maze):
