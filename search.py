@@ -79,10 +79,9 @@ def dfs(maze):
             path.append(curr_state)
             num_states_explored += 1
 
-            if curr_state in objectives:
-                objectives.remove(curr_state)
-                if len(objectives) == 0:
-                    return path, num_states_explored
+            if maze.isObjective(curr_state[0], curr_state[1]):
+                break
+
             for neighbor in maze.getNeighbors(curr_state[0], curr_state[1]):
                 to_visit.append(neighbor)
 
@@ -97,22 +96,23 @@ def greedy(maze):
     visited = []
     to_visit = queue.PriorityQueue()
     start = maze.getStart()
-    to_visit.put(start)
+    to_visit.put((1, start))
     objectives = maze.getObjectives()
 
     while not to_visit.empty():
         curr_state = to_visit.get()
 
-        if curr_state not in path:
-            path.append(curr_state)
+        if curr_state[1] not in visited:
+            path.append(curr_state[1])
+            visited.append(curr_state[1])
             num_states_explored += 1
 
-            if maze.isObjective(curr_state[0], curr_state[1]):
+            if maze.isObjective(curr_state[1][0], curr_state[1][1]):
                 break
 
-            for neighbor in maze.getNeighbors(curr_state[0], curr_state[1]):
-                if neighbor not in path:
-                    to_visit.put(neighbor)
+            for neighbor in maze.getNeighbors(curr_state[1][0], curr_state[1][1]):
+                if neighbor not in visited:
+                    to_visit.put((manhattan_dist(neighbor, maze), neighbor))
 
     return path, num_states_explored
 
