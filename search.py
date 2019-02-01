@@ -143,7 +143,7 @@ def astar(maze):
 
         #if curr_state[1] not in visited:
 
-        #    visited.append(curr_state[1])
+        visited.append(curr_state[1])
         num_states_explored += 1
         #end_states.put(curr_state[1])
         #print("Here?")
@@ -152,6 +152,7 @@ def astar(maze):
             print("At objective")
             objectives.remove(curr_state[1])
             end_states.put(curr_state[1])
+            visited = []
             objectives_reached += 1
             if not objectives:
                 #end_state = curr_state[1]
@@ -166,7 +167,7 @@ def astar(maze):
         
         neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
         for neighbor in neighbors:
-            if maze.isValidMove(neighbor[0], neighbor[1]):
+            if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
                 to_visit.put((manhattan_dist(neighbor, maze) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
                 path_tracker[neighbor] = curr_state[1]
     
