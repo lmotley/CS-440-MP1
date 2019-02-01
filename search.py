@@ -163,6 +163,7 @@ def astar(maze):
             #print(path_tracker)
             pseudo_start = curr_state[1]
             tracked.append(pseudo_path)
+            to_visit=queue.PriorityQueue()
             pseudo_path = []
             #print(tracked)
             path_tracker.clear()
