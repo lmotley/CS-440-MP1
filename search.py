@@ -128,58 +128,69 @@ def astar(maze):
     # TODO: Write your code here
     # return path, num_states_explored
     start = maze.getStart()
+    pseudo_start = start
     to_visit = queue.PriorityQueue()
     to_visit.put((1, start, 0)) #(priority, (x,  y), g)
     path_tracker = {start: None}
     objectives = maze.getObjectives()
+    num_objectives = len(objectives)
+    tracked = []
     path = []
+    pseudo_path = []
     visited = []
+    end_state = (0,0)
     num_states_explored = 0
     objectives_reached = 0
     end_states = queue.Queue()
 
     while not to_visit.empty():
         curr_state = to_visit.get()
-
+        #print("state is ", curr_state[1])
         #if curr_state[1] not in visited:
-
+        #end_states.put(curr_state[1])
         visited.append(curr_state[1])
         num_states_explored += 1
-        #end_states.put(curr_state[1])
-        #print("Here?")
-        #if maze.isObjective(curr_state[1][0], curr_state[1][1]):
         if curr_state[1] in objectives:
-            print("At objective")
+            #print("At objective")
             objectives.remove(curr_state[1])
             end_states.put(curr_state[1])
+            es = curr_state[1]
+            pseudo_path.insert(0,curr_state[1])
+            while es!=pseudo_start and es in path_tracker:
+            #    print(es)
+                pseudo_path.insert(0,es)
+                es = path_tracker[es]
+            #print(path_tracker)
+            pseudo_start = curr_state[1]
+            tracked.append(pseudo_path)
+            pseudo_path = []
+            #print(tracked)
+            path_tracker.clear()
             visited = []
             objectives_reached += 1
             if not objectives:
-                #end_state = curr_state[1]
-                print("Done")
-                break
-        #    else:
-        #        neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
-        #        for neighbor in neighbors:
-        #            if maze.isValidMove(neighbor[0], neighbor[1]):
-        #                to_visit.put((manhattan_dist(neighbor, maze) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
-        #                path_tracker[neighbor] = curr_state[1]
-        
+                end_state = curr_state[1]
+                print("Reached " , objectives_reached , " out of " , num_objectives )
+                break   
         neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
         for neighbor in neighbors:
-            if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
+            if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]) and neighbor!=curr_state[1]:
+                #print("neighbor is ", neighbor)
                 to_visit.put((manhattan_dist(neighbor, maze) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
                 path_tracker[neighbor] = curr_state[1]
     
-
-    i = 0                    
-    while i!=objectives_reached :
-        path.insert(i, end_states.get())
-        #end_states.removeAt(i)
-        i+=1
-        #end_state = path_tracker[end_state]
-        #break
-
+    #print(tracked)
+    while len(tracked)!=0:
+        p = tracked.pop()
+        while len(p)!=0:
+            path.insert(0,p.pop())
+        #print(p)
+    #while end_state:
+    #    p = tracked[end_state]
+    #    print(p)
+        #path.insert(0,p)
+    #    end_state = p[0]
+        
     return path, num_states_explored
 
 def manhattan_dist(pos, maze):
