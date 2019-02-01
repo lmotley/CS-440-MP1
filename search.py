@@ -131,32 +131,53 @@ def astar(maze):
     to_visit = queue.PriorityQueue()
     to_visit.put((1, start, 0)) #(priority, (x,  y), g)
     path_tracker = {start: None}
+    objectives = maze.getObjectives()
     path = []
     visited = []
     num_states_explored = 0
-    end_state = (0, 0)
+    objectives_reached = 0
+    end_states = queue.Queue()
 
     while not to_visit.empty():
         curr_state = to_visit.get()
 
-        if curr_state[1] not in visited:
+        #if curr_state[1] not in visited:
 
-            visited.append(curr_state[1])
-            num_states_explored += 1
-
-            if maze.isObjective(curr_state[1][0], curr_state[1][1]):
-                end_state = curr_state[1]
+        #    visited.append(curr_state[1])
+        num_states_explored += 1
+        #end_states.put(curr_state[1])
+        #print("Here?")
+        #if maze.isObjective(curr_state[1][0], curr_state[1][1]):
+        if curr_state[1] in objectives:
+            print("At objective")
+            objectives.remove(curr_state[1])
+            end_states.put(curr_state[1])
+            objectives_reached += 1
+            if not objectives:
+                #end_state = curr_state[1]
+                print("Done")
                 break
+        #    else:
+        #        neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
+        #        for neighbor in neighbors:
+        #            if maze.isValidMove(neighbor[0], neighbor[1]):
+        #                to_visit.put((manhattan_dist(neighbor, maze) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
+        #                path_tracker[neighbor] = curr_state[1]
+        
+        neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
+        for neighbor in neighbors:
+            if maze.isValidMove(neighbor[0], neighbor[1]):
+                to_visit.put((manhattan_dist(neighbor, maze) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
+                path_tracker[neighbor] = curr_state[1]
+    
 
-            neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
-            for neighbor in neighbors:
-                if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
-                    to_visit.put((manhattan_dist(neighbor, maze) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
-                    path_tracker[neighbor] = curr_state[1]
-
-    while end_state:
-        path.insert(0, end_state)
-        end_state = path_tracker[end_state]
+    i = 0                    
+    while i!=objectives_reached :
+        path.insert(i, end_states.get())
+        #end_states.removeAt(i)
+        i+=1
+        #end_state = path_tracker[end_state]
+        #break
 
     return path, num_states_explored
 
@@ -168,4 +189,13 @@ def manhattan_dist(pos, maze):
         if heuristic < min_heuristic:
             min_heuristic = heuristic
 
+    return min_heuristic
+
+def heuristic_func(pos,maze):
+    objectives = maze.getObjectives()
+    min_heuristic = sys.maxsize
+    for objective in objectives:
+        heuristic = abs(pos[0] - objective[0]) + abs(pos[1] - objective[1]) #placeholder
+        if heuristic < min_heuristic:
+            min_heuristic = heuristic
     return min_heuristic
