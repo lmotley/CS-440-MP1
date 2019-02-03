@@ -177,7 +177,7 @@ def astar(maze):
         for neighbor in neighbors:
             if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]) and neighbor!=curr_state[1]:
                 #print("neighbor is ", neighbor)
-                to_visit.put((manhattan_dist(neighbor, maze) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
+                to_visit.put((heuristic_func(neighbor, maze,objectives) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
                 path_tracker[neighbor] = curr_state[1]
     
     #print(tracked)
@@ -204,11 +204,47 @@ def manhattan_dist(pos, maze):
 
     return min_heuristic
 
-def heuristic_func(pos,maze):
-    objectives = maze.getObjectives()
-    min_heuristic = sys.maxsize
+def heuristic_func(pos,maze, objectives):
+    #objectives = maze.getObjectives()
+    weighted_objectives = {(pos,pos): 0}
+    vertex = [pos]
+    visited = [pos]
     for objective in objectives:
-        heuristic = abs(pos[0] - objective[0]) + abs(pos[1] - objective[1]) #placeholder
-        if heuristic < min_heuristic:
-            min_heuristic = heuristic
-    return min_heuristic
+        if objective not in vertex:
+            vertex.append(objective)
+    #print(vertex)
+    mstSet = [pos]
+    for objective in vertex:
+        for obj in vertex:
+            dist = abs(obj[0] - objective[0])+ abs(obj[1]-objective[1])
+            weighted_objectives[(objective,obj)] = dist
+    #print(min_weight)
+    curr_vertex = pos
+    path_length = 0
+    while len(visited)!=len(vertex):
+        print(visited)
+        print(vertex)
+        min_weight = 10000000
+        goal = None
+        for (objective,objs) in weighted_objectives:
+            #print(objective)
+            if weighted_objectives[(objective,objs)] < min_weight and objective==curr_vertex and objective!=objs and objs not in visited:
+                min_weight = weighted_objectives[(objective,objs)]
+                goal = objs
+                curr_vertex = objs
+        #print('here')
+        mstSet.append(goal)
+        visited.append(goal)
+    i=0
+    while i < len(mstSet)-1:
+        path_length+=weighted_objectives[(mstSet[i],mstSet[i+1])]
+        i+=1
+    print(path_length)
+    return path_length    
+    #print(min(weighted_objectives,weighted_objectives.get))
+    #while not weighted_objectives:
+    #    min_obj = min(weighted_objectives,weighted_objectives.get)
+    #    for key in min_obj:
+    #        print(key + " with length " + min_obj[key])
+    #return 0
+
