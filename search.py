@@ -115,21 +115,28 @@ def greedy(maze):
     start = maze.getStart()
     to_visit.put((1, start))
     objectives = maze.getObjectives()
+    path_tracker = {start: None}
+    end_state = (0, 0)
 
     while not to_visit.empty():
         curr_state = to_visit.get()
 
         if curr_state[1] not in visited:
-            path.append(curr_state[1])
             visited.append(curr_state[1])
             num_states_explored += 1
 
             if maze.isObjective(curr_state[1][0], curr_state[1][1]):
+                end_state = curr_state[1]
                 break
 
             for neighbor in maze.getNeighbors(curr_state[1][0], curr_state[1][1]):
                 if neighbor not in visited:
                     to_visit.put((manhattan_dist(neighbor, maze), neighbor))
+                    path_tracker[neighbor] = curr_state[1]
+
+    while end_state:
+        path.insert(0, end_state)
+        end_state = path_tracker[end_state]
 
     return path, num_states_explored
 
