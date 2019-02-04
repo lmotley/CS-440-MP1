@@ -166,6 +166,7 @@ def astar(maze):
                 pseudo_start = curr_state[1]
                 #print(path_taken)
                 tracked.append(path_taken)
+                #path_tracker.clear()
                 if not objectives:
                     end_state = curr_state[1]
                     break
@@ -192,14 +193,13 @@ def astar(maze):
     while len(tracked)!=0:
         p = tracked.pop()
         while len(p)!=0:
-            path.insert(0,p.pop())
+            path.append(p.pop())
     #    print(end_state)
         #print(path_tracker)
         #path.insert(0, end_state)
         #end_state = path_tracker[end_state].pop()
     #print(path)
     #print(path_tracker)
-
     return path, num_states_explored
 
 def manhattan_dist(pos, maze):
