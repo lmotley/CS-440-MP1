@@ -128,70 +128,78 @@ def astar(maze):
     # TODO: Write your code here
     # return path, num_states_explored
     start = maze.getStart()
-    pseudo_start = start
     to_visit = queue.PriorityQueue()
     to_visit.put((1, start, 0)) #(priority, (x,  y), g)
-    path_tracker = {start: None}
-    objectives = maze.getObjectives()
-    num_objectives = len(objectives)
+    path_tracker = {start: [None]}
     tracked = []
-    path = []
-    pseudo_path = []
+    path = [start]
+    path_taken = []
     visited = []
-    end_state = (0,0)
     num_states_explored = 0
-    objectives_reached = 0
-    end_states = queue.Queue()
+    end_state = (0, 0)
+    pseudo_start = start
+    objectives = maze.getObjectives()
 
     while not to_visit.empty():
         curr_state = to_visit.get()
-        #print("state is ", curr_state[1])
-        #if curr_state[1] not in visited:
-        #end_states.put(curr_state[1])
-        visited.append(curr_state[1])
-        num_states_explored += 1
-        if curr_state[1] in objectives:
-            #print("At objective")
-            objectives.remove(curr_state[1])
-            end_states.put(curr_state[1])
-            es = curr_state[1]
-            pseudo_path.insert(0,curr_state[1])
-            while es!=pseudo_start and es in path_tracker:
-            #    print(es)
-                pseudo_path.insert(0,es)
-                es = path_tracker[es]
-            #print(path_tracker)
-            pseudo_start = curr_state[1]
-            tracked.append(pseudo_path)
-            to_visit=queue.PriorityQueue()
-            pseudo_path = []
-            #print(tracked)
-            path_tracker.clear()
-            visited = []
-            objectives_reached += 1
-            if not objectives:
-                end_state = curr_state[1]
-                print("Reached " , objectives_reached , " out of " , num_objectives )
-                break   
-        neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
-        for neighbor in neighbors:
-            if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]) and neighbor!=curr_state[1]:
-                #print("neighbor is ", neighbor)
-                to_visit.put((heuristic_func(neighbor, maze,objectives) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
-                path_tracker[neighbor] = curr_state[1]
-    
-    #print(tracked)
+
+        if (curr_state[1], objectives) not in visited:
+
+
+            num_states_explored += 1
+
+            #print(curr_state[1])
+            #print(objectives)
+
+            if curr_state[1] in objectives:
+                objectives.remove(curr_state[1])
+                es = curr_state[1]
+                #print(es)
+                #print(path_tracker[es])
+                #path_taken.insert(0,curr_state[1])
+                while es!=pseudo_start and es in path_tracker and path_tracker[es]:
+                    path_taken.insert(0,es)
+                    print(path_tracker[es])
+                    es = path_tracker[es].pop()
+                #print("ob:", curr_state[1])
+                
+                pseudo_start = curr_state[1]
+                #print(path_taken)
+                tracked.append(path_taken)
+                if not objectives:
+                    end_state = curr_state[1]
+                    break
+
+            visited.append((curr_state[1], objectives[:]))
+
+
+            neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
+            for neighbor in neighbors:
+                #if neighbor == (3,3):
+                    #print(neighbor, " ", objectives)
+                    #print((neighbor, objectives) in visited)
+                    #print(visited)
+                if (neighbor, objectives) not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
+                    #if neighbor == (3,3):
+                      #  print(curr_state[1], " ",)
+                    to_visit.put((heuristic_func(neighbor, maze, objectives) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
+                    if neighbor in path_tracker:
+                        path_tracker[neighbor].append(curr_state[1])
+                    else:
+                        path_tracker[neighbor] = [curr_state[1]]
+
+    #print(path_tracker)
     while len(tracked)!=0:
         p = tracked.pop()
         while len(p)!=0:
             path.insert(0,p.pop())
-        #print(p)
-    #while end_state:
-    #    p = tracked[end_state]
-    #    print(p)
-        #path.insert(0,p)
-    #    end_state = p[0]
-        
+    #    print(end_state)
+        #print(path_tracker)
+        #path.insert(0, end_state)
+        #end_state = path_tracker[end_state].pop()
+    #print(path)
+    #print(path_tracker)
+
     return path, num_states_explored
 
 def manhattan_dist(pos, maze):
@@ -222,8 +230,8 @@ def heuristic_func(pos,maze, objectives):
     curr_vertex = pos
     path_length = 0
     while len(visited)!=len(vertex):
-        print(visited)
-        print(vertex)
+    #    print(visited)
+    #    print(vertex)
         min_weight = 10000000
         goal = None
         for (objective,objs) in weighted_objectives:
@@ -239,7 +247,7 @@ def heuristic_func(pos,maze, objectives):
     while i < len(mstSet)-1:
         path_length+=weighted_objectives[(mstSet[i],mstSet[i+1])]
         i+=1
-    print(path_length)
+    #print(path_length)
     return path_length    
     #print(min(weighted_objectives,weighted_objectives.get))
     #while not weighted_objectives:
