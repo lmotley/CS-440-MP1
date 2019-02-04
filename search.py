@@ -74,23 +74,33 @@ def dfs(maze):
     # return path, num_states_explored
     path = []
     num_states_explored = 0
+    visited = []
     to_visit = []
     start = maze.getStart()
     to_visit.append(start)
     objectives = maze.getObjectives()
+    path_tracker = {start: None}
+    end_state = (0, 0)
 
     while to_visit:
         curr_state = to_visit.pop()
 
-        if curr_state not in path:
-            path.append(curr_state)
+        if curr_state not in visited:
+            visited.append(curr_state)
             num_states_explored += 1
 
             if maze.isObjective(curr_state[0], curr_state[1]):
+                end_state = curr_state
                 break
 
             for neighbor in maze.getNeighbors(curr_state[0], curr_state[1]):
-                to_visit.append(neighbor)
+                if neighbor not in visited:
+                    to_visit.append(neighbor)
+                    path_tracker[neighbor] = curr_state
+
+    while end_state:
+        path.insert(0, end_state)
+        end_state = path_tracker[end_state]
 
     return path, num_states_explored
 
@@ -105,21 +115,28 @@ def greedy(maze):
     start = maze.getStart()
     to_visit.put((1, start))
     objectives = maze.getObjectives()
+    path_tracker = {start: None}
+    end_state = (0, 0)
 
     while not to_visit.empty():
         curr_state = to_visit.get()
 
         if curr_state[1] not in visited:
-            path.append(curr_state[1])
             visited.append(curr_state[1])
             num_states_explored += 1
 
             if maze.isObjective(curr_state[1][0], curr_state[1][1]):
+                end_state = curr_state[1]
                 break
 
             for neighbor in maze.getNeighbors(curr_state[1][0], curr_state[1][1]):
                 if neighbor not in visited:
                     to_visit.put((manhattan_dist(neighbor, maze), neighbor))
+                    path_tracker[neighbor] = curr_state[1]
+
+    while end_state:
+        path.insert(0, end_state)
+        end_state = path_tracker[end_state]
 
     return path, num_states_explored
 
