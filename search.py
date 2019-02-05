@@ -128,91 +128,95 @@ def astar(maze):
     # return path, num_states_explored
     start = maze.getStart()
     to_visit = queue.PriorityQueue()
+    solo_to_visit = queue.PriorityQueue()
     to_visit.put((1, start, 0)) #(priority, (x,  y), g)
+    solo_to_visit.put((1,start,0))
     path_tracker = {start: None}
+    solo_path_tracker = {start: None}
     tracked = []
     path = [start]
+    solo_path = [start]
     path_taken = []
     visited = []
+    solo_visited = []
     num_states_explored = 0
+    solo_num_states_explored =0 
     end_state = (0, 0)
+    solo_end_state = (0,0)
     pseudo_start = start
     objectives = maze.getObjectives()
+    solo_objective = maze.getObjectives()
    # print(objectives)
 
     if len(objectives)==1:
  
        # print("In single dot")
-        while not to_visit.empty():
-            curr_state = to_visit.get()
+        while not solo_to_visit.empty():
+            curr_state = solo_to_visit.get()
 
-            if curr_state[1] not in visited:
-                visited.append(curr_state[1])
+            if curr_state[1] not in solo_visited:
+                solo_visited.append(curr_state[1])
             
-            num_states_explored += 1
+            solo_num_states_explored += 1
 
             if maze.isObjective(curr_state[1][0], curr_state[1][1]):
-                end_state = curr_state[1]
+                solo_end_state = curr_state[1]
                 break
 
             neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
             for neighbor in neighbors:
-                if neighbor not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
-                    to_visit.put((manhattan_dist(neighbor, maze) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
-                    path_tracker[neighbor] = curr_state[1]
+                if neighbor not in solo_visited and maze.isValidMove(neighbor[0], neighbor[1]):
+                    solo_to_visit.put((manhattan_dist(neighbor, maze) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
+                    solo_path_tracker[neighbor] = curr_state[1]
 
-        while end_state:
-            path.insert(0, end_state)
-            end_state = path_tracker[end_state]
+        while solo_end_state:
+            solo_path.insert(0, solo_end_state)
+            solo_end_state = solo_path_tracker[solo_end_state]
 
-        return path, num_states_explored
+        return solo_path, solo_num_states_explored
 
     else:    
         while not to_visit.empty():
             curr_state = to_visit.get()
 
             if (curr_state[1], objectives) not in visited:
-
-
                 num_states_explored += 1
 
             #print(curr_state[1])
             #print(objectives)
 
-                if curr_state[1] in objectives:
-                    objectives.remove(curr_state[1])
-
-                    temp = []
-                    end_state = curr_state[1]
-                    #print(path_tracker)
-                    while end_state and end_state in path_tracker:
-                        #print(end_state)
-                        temp.insert(0, end_state)
-                        end_state = path_tracker[end_state]
-
-                    path += temp
-                    path_tracker.clear()
+            if curr_state[1] in objectives:
+                objectives.remove(curr_state[1])
+                temp = []
+                end_state = curr_state[1]
+                #print(path_tracker)
+                while end_state and end_state in path_tracker:
+                    #print(end_state)
+                    temp.insert(0, end_state)
+                    end_state = path_tracker[end_state]
+                path += temp
+                path_tracker.clear()
                     #path_tracker[curr_state[1]] = None
-                    if not objectives:
-                        end_state = curr_state[1]
-                        break
+                if not objectives:
+                    end_state = curr_state[1]
+                    break
 
-                visited.append((curr_state[1], objectives[:]))
+            visited.append((curr_state[1], objectives[:]))
 
 
-                neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
-                neighbor_to_use = None
-                min_dist=10000
-                for neighbor in neighbors:
-                    if (neighbor, objectives) not in visited and maze.isValidMove(neighbor[0], neighbor[1]) and neighbor!=curr_state[1]:
-                        dist = heuristic_func(neighbor, maze, objectives) + curr_state[2] + 1
-                        if dist<min_dist:
-                            neighbor_to_use=neighbor
-                            min_dist = dist
+            neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
+            # neighbor_to_use = None
+            # min_dist=10000
+            for neighbor in neighbors:
+                if (neighbor, objectives) not in visited and maze.isValidMove(neighbor[0], neighbor[1]) and neighbor!=curr_state[1]:
+                    dist = heuristic_func(neighbor, maze, objectives) + curr_state[2] + 1
+                    # if dist<min_dist:
+                    #     neighbor_to_use=neighbor
+                    #     min_dist = dist
+                    to_visit.put((dist, neighbor, curr_state[2] + 1))
+                    path_tracker[neighbor] = curr_state[1]
 
-                to_visit.put((min_dist, neighbor_to_use, curr_state[2] + 1))
-                path_tracker[neighbor_to_use] = curr_state[1]
-
+            
     #print(tracked)
     #while len(tracked)!=0:
      #   p = tracked.pop()
@@ -260,7 +264,7 @@ def heuristic_func(pos,maze, objectives):
 
     for objective in vertex:
         for obj in vertex:
-            if objective!=obj and ((objective,obj) not in seen or (obj,objective) not in seen):
+            if objective!=obj and ((objective,obj) not in seen or (obj,objective) not in seen) and (obj,objective) not in weighted_objectives:
                 seen[(objective,obj)]=True
                 seen[(obj,objective)]=True
                 new_maze.setStart(objective)
