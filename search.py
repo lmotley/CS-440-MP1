@@ -138,11 +138,11 @@ def astar(maze):
     end_state = (0, 0)
     pseudo_start = start
     objectives = maze.getObjectives()
-    print(objectives)
+   # print(objectives)
 
     if len(objectives)==1:
  
-        print("In single dot")
+       # print("In single dot")
         while not to_visit.empty():
             curr_state = to_visit.get()
 
@@ -192,7 +192,7 @@ def astar(maze):
 
                     path += temp
                     path_tracker.clear()
-                    path_tracker[curr_state[1]] = None
+                    #path_tracker[curr_state[1]] = None
                     if not objectives:
                         end_state = curr_state[1]
                         break
@@ -201,10 +201,17 @@ def astar(maze):
 
 
                 neighbors = maze.getNeighbors(curr_state[1][0], curr_state[1][1])
+                neighbor_to_use = None
+                min_dist=10000
                 for neighbor in neighbors:
-                    if (neighbor, objectives) not in visited and maze.isValidMove(neighbor[0], neighbor[1]):
-                        to_visit.put((heuristic_func(neighbor, maze, objectives) + curr_state[2] + 1, neighbor, curr_state[2] + 1))
-                        path_tracker[neighbor] = curr_state[1]
+                    if (neighbor, objectives) not in visited and maze.isValidMove(neighbor[0], neighbor[1]) and neighbor!=curr_state[1]:
+                        dist = heuristic_func(neighbor, maze, objectives) + curr_state[2] + 1
+                        if dist<min_dist:
+                            neighbor_to_use=neighbor
+                            min_dist = dist
+
+                to_visit.put((min_dist, neighbor_to_use, curr_state[2] + 1))
+                path_tracker[neighbor_to_use] = curr_state[1]
 
     #print(tracked)
     #while len(tracked)!=0:
@@ -217,7 +224,7 @@ def astar(maze):
         #print(path_tracker)
         #path.insert(0, end_state)
         #end_state = path_tracker[end_state].pop()
-        print(path)
+        print(path.pop(0))
     #print(path_tracker)
         return path, num_states_explored
 
@@ -244,7 +251,7 @@ def heuristic_func(pos,maze, objectives):
             vertex.append(objective)
     #print(vertex)
     mstSet = [pos]
-    print("vertices are ", vertex)
+    #print("vertices are ", vertex)
     # i=0
     # j = len(vertex)
     # print(i,j)
@@ -258,11 +265,11 @@ def heuristic_func(pos,maze, objectives):
                 seen[(obj,objective)]=True
                 new_maze.setStart(objective)
                 new_maze.setObjectives([obj])
-                print("objective should be ", [obj])
-                print("objectives are ",new_maze.getObjectives())
-                print("start is ",new_maze.getStart())
+                #print("objective should be ", [obj])
+                #print("objectives are ",new_maze.getObjectives())
+                #print("start is ",new_maze.getStart())
                 (path,x) = astar(new_maze)
-                print(len(path))
+                #print(len(path))
                 weighted_objectives[(objective,obj)]=len(path)
                 weighted_objectives[(obj,objective)]=len(path)
             #(path,x) = astar(new_maze)#abs(obj[0] - objective[0])+ abs(obj[1]-objective[1])
